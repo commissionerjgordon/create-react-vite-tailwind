@@ -122,7 +122,7 @@ public
 
   // Final success message
   console.log(
-    chalk.green.bold(`\n✅ Project "${projectName}" created successfully!\n`),
+    chalk.green.bold(`\n✅ Project "${projectName}" created successfully!!\n`),
   );
   console.log(chalk.cyan("Next steps:"));
   console.log(`   cd ${projectName}`);
