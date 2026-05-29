@@ -6,6 +6,26 @@
   "bin": {
     "create-react-vite-tailwind": "./bin/cli.js"
   },
+  "keywords": [
+    "react",
+    "cli",
+    "vite",
+    "tailwind",
+    "tailwindcss",
+    "eslint",
+    "prettier",
+    "scaffold",
+    "create"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commissionerjgordon/create-react-vite-tailwind.git"
+  },
+  "author": "commissionerjgordon",
+  "homepage": "https://github.com/commissionerjgordon/create-react-vite-tailwind#readme",
+  "bugs": {
+    "url": "https://github.com/commissionerjgordon/create-react-vite-tailwind/issues"
+  },
   "scripts": {
     "release": "changeset publish",
     "version": "changeset version",
