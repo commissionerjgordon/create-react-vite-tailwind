@@ -1,0 +1,30 @@
+{
+  "name": "create-react-vite-tailwind",
+  "version": "1.0.0",
+  "description": "Scaffold React + Vite + Tailwind + ESLint + Prettier",
+  "type": "module",
+  "bin": {
+    "create-react-vite-tailwind": "./bin/cli.js"
+  },
+  "scripts": {
+    "release": "changeset publish",
+    "version": "changeset version",
+    "changeset": "changeset"
+  },
+  "files": [
+    "bin",
+    "templates"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "ora": "^8.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.0"
+  }
+}
