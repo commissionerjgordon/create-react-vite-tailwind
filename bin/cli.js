@@ -6,10 +6,22 @@ import path from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
 import ora from "ora";
+import { Command } from "commander";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const program = new Command();
 
-const projectName = process.argv[2] || "my-react-app";
+program
+  .name("create-vite-react-tailwind")
+  .description("Scaffold a modern React + Vite + Tailwind v4 app")
+  .argument("[project-name]", "Name of the project", "my-react-app")
+  .option("--minimal", "Skip creating additional folder structure")
+  .option("--no-structure", "Skip creating additional folder structure")
+  .parse();
+
+const projectName = program.args[0];
+const options = program.opts();
+const shouldCreateStructure = !options.minimal && !options.structure === false;
 
 console.log(
   chalk.cyan.bold(
@@ -20,13 +32,10 @@ console.log(
 const spinner = ora("Creating Vite project...").start();
 
 try {
-  // 1. Create Vite React + TypeScript project
+  // 1. Create Vite React + TypeScript project (non-interactive)
   execSync(
     `npm create vite@latest ${projectName} -- --template react-ts --no-interactive --no-immediate`,
-    {
-      stdio: "inherit",
-      shell: true,
-    },
+    { stdio: "inherit", shell: true },
   );
 
   const projectPath = path.join(process.cwd(), projectName);
@@ -52,7 +61,7 @@ try {
 
   spinner.succeed(chalk.green("Dependencies installed!"));
 
-  // 3. Tailwind v4 Setup (Modern way)
+  // 3. Tailwind v4 Setup
   spinner.start("Setting up Tailwind CSS v4...");
 
   // Update vite.config.ts
@@ -80,7 +89,65 @@ try {
 
   spinner.succeed(chalk.green("Tailwind CSS v4 configured!"));
 
-  // 4. ESLint + Prettier setup
+  // 4. Create Folder Structure (if not minimal)
+  if (shouldCreateStructure) {
+    spinner.start("Creating folder structure...");
+
+    const folders = [
+      "src/components",
+      "src/components/ui",
+      "src/hooks",
+      "src/lib",
+      "src/assets",
+    ];
+
+    folders.forEach((folder) => {
+      fs.mkdirSync(folder, { recursive: true });
+    });
+
+    // Create example files
+    fs.writeFileSync(
+      "src/lib/utils.ts",
+      `export const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');\n`,
+    );
+
+    fs.writeFileSync(
+      "src/hooks/useCounter.ts",
+      `import { useState } from 'react';
+
+export function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+  const increment = () => setCount(c => c + 1);
+  const decrement = () => setCount(c => c - 1);
+  return { count, increment, decrement };
+}\n`,
+    );
+
+    // Example UI component
+    fs.writeFileSync(
+      "src/components/ui/Button.tsx",
+      `import type { ButtonHTMLAttributes } from 'react';
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline';
+}
+
+export default function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {
+  return (
+    <button
+      className={\`px-4 py-2 rounded-lg font-medium transition-all \${className}\`}
+      {...props}
+    />
+  );
+}\n`,
+    );
+
+    spinner.succeed(chalk.green("Folder structure created!"));
+  } else {
+    console.log(chalk.yellow("→ Skipping folder structure (minimal mode)"));
+  }
+
+  // 5. ESLint + Prettier Setup
   spinner.start("Setting up ESLint & Prettier...");
 
   const eslintTemplate = fs.readFileSync(
@@ -89,24 +156,26 @@ try {
   );
   fs.writeFileSync("eslint.config.js", eslintTemplate);
 
-  // Prettier config
-  const prettierConfig = `{
+  fs.writeFileSync(
+    ".prettierrc",
+    `{
   "semi": true,
   "trailingComma": "es5",
   "singleQuote": true,
   "printWidth": 100,
   "tabWidth": 2,
   "useTabs": false
-}`;
-  fs.writeFileSync(".prettierrc", prettierConfig);
+}`,
+  );
 
-  // Prettier ignore
-  const prettierIgnore = `dist
+  fs.writeFileSync(
+    ".prettierignore",
+    `dist
 node_modules
 public
 *.min.js
-`;
-  fs.writeFileSync(".prettierignore", prettierIgnore);
+`,
+  );
 
   // Update package.json scripts
   const pkg = JSON.parse(fs.readFileSync("package.json", "utf-8"));
@@ -120,10 +189,11 @@ public
 
   spinner.succeed(chalk.green("ESLint & Prettier configured!"));
 
-  // Final success message
+  // Final Message
   console.log(
-    chalk.green.bold(`\n✅ Project "${projectName}" created successfully!!\n`),
+    chalk.green.bold(`\n✅ Project "${projectName}" created successfully!\n`),
   );
+
   console.log(chalk.cyan("Next steps:"));
   console.log(`   cd ${projectName}`);
   console.log(`   npm run dev\n`);
