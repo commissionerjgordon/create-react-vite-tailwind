@@ -15,13 +15,15 @@ program
   .name("create-vite-react-tailwind")
   .description("Scaffold a modern React + Vite + Tailwind v4 app")
   .argument("[project-name]", "Name of the project", "my-react-app")
-  .option("--minimal", "Skip creating additional folder structure")
-  .option("--no-structure", "Skip creating additional folder structure")
+  .option("--minimal", "Skip folder structure and routing")
+  .option("--no-structure", "Skip folder structure")
+  .option("--no-routing", "Skip React Router DOM for page routing")
   .parse();
 
 const projectName = program.args[0];
 const options = program.opts();
 const shouldCreateStructure = !options.minimal && !options.structure === false;
+const shouldAddRouting = !options.minimal && !options.routing === false;
 
 console.log(
   chalk.cyan.bold(
@@ -32,7 +34,7 @@ console.log(
 const spinner = ora("Creating Vite project...").start();
 
 try {
-  // 1. Create Vite React + TypeScript project (non-interactive)
+  // 1. Create Vite project
   execSync(
     `npm create vite@latest ${projectName} -- --template react-ts --no-interactive --no-immediate`,
     { stdio: "inherit", shell: true },
@@ -46,14 +48,19 @@ try {
   // 2. Install dependencies
   spinner.start("Installing dependencies...");
 
-  execSync(
-    "npm install -D autoprefixer tailwindcss @tailwindcss/vite postcss",
-    {
-      stdio: "inherit",
-    },
-  );
-  execSync("npm install react-icons", { stdio: "inherit" });
+  let deps = [
+    "autoprefixer",
+    "tailwindcss",
+    "@tailwindcss/vite",
+    "postcss",
+    "react-icons",
+  ];
 
+  if (shouldAddRouting) {
+    deps.push("react-router-dom");
+  }
+
+  execSync(`npm install ${deps.join(" ")}`, { stdio: "inherit" });
   execSync(
     "npm install -D eslint prettier eslint-plugin-react-hooks @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier eslint-plugin-prettier @eslint/css",
     { stdio: "inherit" },
@@ -101,11 +108,9 @@ try {
       "src/assets",
     ];
 
-    folders.forEach((folder) => {
-      fs.mkdirSync(folder, { recursive: true });
-    });
+    folders.forEach((folder) => fs.mkdirSync(folder, { recursive: true }));
 
-    // Create example files
+    // Utility file
     fs.writeFileSync(
       "src/lib/utils.ts",
       `export const cn = (...classes: string[]) => classes.filter(Boolean).join(' ');\n`,
@@ -144,10 +149,90 @@ export default function Button({ variant = 'primary', className = '', ...props }
 
     spinner.succeed(chalk.green("Folder structure created!"));
   } else {
-    console.log(chalk.yellow("→ Skipping folder structure (minimal mode)"));
+    console.log(chalk.yellow("→ Skipping folder structure"));
   }
 
-  // 5. ESLint + Prettier Setup
+  // 5. Add Routing (if requested)
+  if (shouldAddRouting) {
+    spinner.start("Setting up React Router...");
+
+    const folders = ["src/pages", "src/routes"];
+
+    folders.forEach((folder) => fs.mkdirSync(folder, { recursive: true }));
+
+    // Create example pages
+    fs.writeFileSync(
+      "src/pages/Home.tsx",
+      `export default function Home() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold mb-4">Welcome</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-400">Your React + Tailwind app is ready.</p>
+      </div>
+    </div>
+  );
+}\n`,
+    );
+
+    fs.writeFileSync(
+      "src/pages/About.tsx",
+      `export default function About() {
+  return (
+    <div className="min-h-screen p-8">
+      <h1 className="text-4xl font-bold mb-6">About Us</h1>
+      <p className="max-w-prose">This is a modern React template with routing enabled.</p>
+    </div>
+  );
+}\n`,
+    );
+
+    // Layout + Router
+    fs.writeFileSync(
+      "src/App.tsx",
+      `import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+
+function Layout() {
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="font-bold text-xl">MyApp</div>
+          <div className="flex gap-6">
+            <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
+            <Link to="/about" className="hover:text-blue-600 transition-colors">About</Link>
+          </div>
+        </div>
+      </nav>
+
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  );
+}\n`,
+    );
+
+    spinner.succeed(chalk.green("React Router configured with example pages!"));
+  } else {
+    // Keep default App.tsx if no routing
+    console.log(chalk.yellow("→ Skipping routing setup"));
+  }
+
+  // 6. ESLint + Prettier
   spinner.start("Setting up ESLint & Prettier...");
 
   const eslintTemplate = fs.readFileSync(
