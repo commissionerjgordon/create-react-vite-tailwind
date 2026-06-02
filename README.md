@@ -15,6 +15,8 @@ Scaffold a modern React + Vite + TypeScript app with Tailwind CSS v4, React Icon
 - ✨ **Prettier** with clean formatting rules
 - 📦 `.prettierignore` configured
 - ⚙️ Ready-to-use `lint`, `lint:fix`, and `format` scripts
+- 📁 Optional folder structure
+- 🛣️ Optional React Router DOM setup
 
 ## 🚀 Quick Start
 
@@ -37,23 +39,51 @@ cd my-awesome-app
 npm run dev
 ```
 
+### Additional Options
+
+```bash
+# Without routing
+npx create-vite-react-tailwind my-awesome-app --no-routing
+```
+
+```bash
+# Without extra folders
+npx create-vite-react-tailwind my-awesome-app --no-structure
+```
+
+## Available Flags
+
+| Flag             | Description                                        | Defualt |
+| ---------------- | -------------------------------------------------- | ------- |
+| `--no-routing`   | Skips `react-router-dom` + basic routing setup     | `false` |
+| `--minimal`      | Skips folder structure, example files, and routing | `false` |
+| `--no-structure` | Skips folder structure and example files           | `false` |
+
 ## 📋 What's Included
 
-| Feature              | Status | Details                                |
-| -------------------- | ------ | -------------------------------------- |
-| Vite + React + TS    | ✓      | Latest templates                       |
-| Tailwind CSS v4      | ✓      | `@import "tailwindcss";` + Vite plugin |
-| React Icons          | ✓      | Ready to import                        |
-| ESLint (Flat Config) | ✓      | TypeScript + React rules               |
-| Prettier             | ✓      | Integrated with ESLint                 |
-| Scripts              | ✓      | `lint`, `lint:fix`, `format`           |
+| Feature              | Status   | Details                                |
+| -------------------- | -------- | -------------------------------------- |
+| Vite + React + TS    | ✓        | Latest templates                       |
+| Tailwind CSS v4      | ✓        | `@import "tailwindcss";` + Vite plugin |
+| React Icons          | ✓        | Ready to import                        |
+| ESLint (Flat Config) | ✓        | TypeScript + React rules               |
+| Prettier             | ✓        | Integrated with ESLint                 |
+| Scripts              | ✓        | `lint`, `lint:fix`, `format`           |
+| Folder Structure     | Optional | `componenets/`, `hooks/`, `lib/`, etc. |
+| React Router DOM     | Optional | With example pages & layout            |
 
 ## 📁 Project Structure (after creation)
 
 ```bash
 my-app/
 ├── src/
-│ ├── components/ # (optional - you can add)
+│ ├── components/
+│ │ └── ui/
+│ ├── pages/
+│ ├── routes/
+│ ├── hooks/
+│ ├── lib/
+│ ├── assets/
 │ ├── App.tsx
 │ ├── main.tsx
 │ └── index.css
