@@ -1,5 +1,11 @@
 # create-react-vite-tailwind
 
+## 1.0.4
+
+### Patch Changes
+
+- [#9](https://github.com/commissionerjgordon/create-react-vite-tailwind/pull/9) [`ec7ceb9`](https://github.com/commissionerjgordon/create-react-vite-tailwind/commit/ec7ceb9ea1c5855437537602d9d556537b2b377c) Thanks [@commissionerjgordon](https://github.com/commissionerjgordon)! - Add react router DOM
+
 ## 1.0.3
 
 ### Patch Changes
